@@ -1,13 +1,7 @@
 package com.code.camping.entity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.*;
 
 
 @Entity
@@ -15,15 +9,17 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "wallet")
+@Builder
+@Table(name = "wallets")
 public class Wallet {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private String walletType;
     private Integer balance;
 
-
     @ManyToOne
-    @JoinColumn(name="user_id", nullable=false)
+    @JoinColumn(name="user_id", nullable = false)
+    @JsonIgnore
     private User user;
 }

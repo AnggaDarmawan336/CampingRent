@@ -1,9 +1,5 @@
 package com.code.camping.entity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,14 +10,14 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "transaction")
+@Table(name = "transactions")
 public class Transaction {
     
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private Integer quantity;
-    private Integer price_riwayat;
-    
+    private Integer price_history;
     
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -30,5 +26,10 @@ public class Transaction {
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
+
+    //waktu pemesanan (Date)
+    //waktu pengembalian
+    //status
+    //cuaca (weater)
     
 }
