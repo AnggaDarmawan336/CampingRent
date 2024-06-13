@@ -1,13 +1,15 @@
 package com.code.camping.utils.dto.webResponse;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class PageResponse<T> {
     private List<T> content;
     private Long total_elements;

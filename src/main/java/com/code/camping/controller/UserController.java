@@ -46,7 +46,7 @@ public class UserController {
         if (isUserIdJWTequalsUserIdReqParams && isTokenNotYetExpired) {
             return Res.renderJson(UserResponse.fromUser(user_service.getById(id)), "User ID Retrieved Successfully", HttpStatus.OK);
         } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied or Token expired");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Failed to Find");
         }
     }
 
@@ -62,7 +62,7 @@ public class UserController {
             User updatedUser = user_service.update(request);
             return ResponseEntity.ok(UserResponse.fromUser(updatedUser));
         } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied or Token expired");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Failed to Find");
         }
     }
 
@@ -81,7 +81,7 @@ public class UserController {
                 return Res.renderJson(null, "Failed to Delete User", HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied or Token expired");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Failed to Find");
         }
     }
 
