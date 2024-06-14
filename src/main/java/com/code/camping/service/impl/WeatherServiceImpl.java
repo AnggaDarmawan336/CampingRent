@@ -1,10 +1,14 @@
 package com.code.camping.service.impl;
 
+import com.code.camping.controller.ErrorController;
 import com.code.camping.entity.Weather;
 import com.code.camping.service.WeatherService;
 import com.code.camping.utils.DateTimeFormatUtil;
+import com.code.camping.utils.dto.webResponse.PageResponse;
+import lombok.AllArgsConstructor;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -12,7 +16,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Service
+@AllArgsConstructor
 public class WeatherServiceImpl implements WeatherService {
 
     private static final String URL_STRING = "https://cuaca-gempa-rest-api.vercel.app/weather/jawa-barat/bandung";
@@ -69,4 +76,27 @@ public class WeatherServiceImpl implements WeatherService {
         }
         return weatherDataList;
     }
+
+    // Add Page, Search tanggal dan waktu juga statusnya/name nya kalo di entity nya
+    public PageResponse<Weather> getAllWithPagingAndFiltering(String date, String name, String time, int page, int size) throws Exception {
+        List<Weather> allWeatherData = getWeatherData();
+        List<Weather> filteredData = allWeatherData.stream()
+                .filter(data -> (date == null || data.getDate().equals(date)) &&
+                        (name == null || data.getName().equalsIgnoreCase(name)) &&
+                        (time == null || data.getTime().equals(time)))
+                .collect(Collectors.toList());
+
+        if (filteredData.isEmpty()) {
+            throw new ErrorController.WeatherDataNotFoundException("Weather Data Not Found");
+        }
+
+        int start = page * size;
+        int end = Math.min(start + size, filteredData.size());
+        if (start >= filteredData.size()) {
+            return new PageResponse<>(List.of(), 0L, 0, page, size);
+        }
+        List<Weather> pageContent = filteredData.subList(start, end);
+        return new PageResponse<>(pageContent, (long) filteredData.size(), (filteredData.size() + size - 1) / size, page, size);
+    }
+
 }

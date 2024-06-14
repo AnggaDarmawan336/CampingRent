@@ -1,13 +1,17 @@
 package com.code.camping.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Entity
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "transactions")
@@ -17,6 +21,8 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private Integer quantity;
+    private Date dateStart;
+    private Date dateEnd;
     private Integer price_history;
     
     @ManyToOne

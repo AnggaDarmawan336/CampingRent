@@ -9,13 +9,16 @@ import lombok.Data;
 @AllArgsConstructor
 @Builder
 public class LoginAdminRequest {
-	private String email;
-	private String password;
+    private String email;
+    private String password;
 
-	public static Admin fromLoginRequestToAdmin(LoginAdminRequest loginAdminRequest){
-		return Admin.builder()
-				.email(loginAdminRequest.getEmail())
-				.password(loginAdminRequest.getPassword())
-				.build();
-	}
+    public static Admin fromLoginRequestToAdminMapper(LoginAdminRequest loginAdminRequest){
+        return Admin.builder()
+            .email(loginAdminRequest.email)
+            .password(loginAdminRequest.password)
+            .build();
+
+
+    }
+
 }
