@@ -38,6 +38,11 @@ public class WalletServiceImpl implements WalletService {
                 .orElseThrow(() -> new HttpServerErrorException(HttpStatus.NOT_FOUND, "Wallet with id " + id + " is not found"));
     }
 
+    public Wallet fineByUserId(String userId) {
+        return wallet_repository.findByUserId(userId);
+                
+    }
+
     @Override
     public Wallet update(WalletRequest request) {
         return wallet_repository.saveAndFlush(request.convert());

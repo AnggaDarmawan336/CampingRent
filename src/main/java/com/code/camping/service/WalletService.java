@@ -11,4 +11,5 @@ public interface WalletService {
     Wallet getById(String id);
     Wallet update(WalletRequest request);
     void delete(String id);
+    Wallet fineByUserId(String userId);
 }

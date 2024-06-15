@@ -10,6 +10,8 @@ import java.util.List;
 
 @Repository
 public interface WalletRepository extends JpaRepository<Wallet, String>, JpaSpecificationExecutor<Wallet> {
-  Wallet findByUser(User user);
+ 
+
+  Wallet findByUserId(String userId);
 
 }
