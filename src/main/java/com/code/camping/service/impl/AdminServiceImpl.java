@@ -4,10 +4,14 @@ import com.code.camping.entity.Admin;
 import com.code.camping.repository.AdminRepository;
 import com.code.camping.security.JwtUtils;
 import com.code.camping.service.AdminService;
+import com.code.camping.utils.GeneralSpecification;
 import com.code.camping.utils.dto.request.LoginAdminRequest;
 import com.code.camping.utils.dto.request.RegisterAdminRequest;
 import com.code.camping.utils.dto.response.LoginAdminResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -50,6 +54,12 @@ public class AdminServiceImpl implements AdminService {
 	public Admin get_by_id(String id) {
 		return admin_repository.findById(id).orElseThrow(() -> new HttpServerErrorException(
 				HttpStatus.NOT_FOUND,"Admin with id " + id + " is not found"));
+	}
+
+	@Override
+	public Page<Admin> get_all(Pageable pageable, RegisterAdminRequest registerAdminRequest) {
+		Specification<Admin> specification = GeneralSpecification.get_specification(registerAdminRequest);
+		return admin_repository.findAll(specification,pageable);
 	}
 
 	@Override
