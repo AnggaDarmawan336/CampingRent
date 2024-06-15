@@ -1,6 +1,8 @@
 package com.code.camping.utils.dto.response;
 
 import com.code.camping.entity.Transaction;
+
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @AllArgsConstructor
@@ -20,7 +22,7 @@ public class TransactionResponse {
         String user_id = (transaction.getUser() != null) ? transaction.getUser().getId() : null;
         String product_id = (transaction.getProduct() != null) ? transaction.getProduct().getId() : null;
 
-add        return TransactionResponse.builder()
+        return TransactionResponse.builder()
                 .id(transaction.getId())
                 .quantity(transaction.getQuantity())
                 .price_history(transaction.getPrice_history())

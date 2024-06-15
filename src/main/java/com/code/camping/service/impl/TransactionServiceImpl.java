@@ -32,6 +32,8 @@ public class TransactionServiceImpl implements TransactionService {
         String product_id = request.getProduct_id();
         Product product = product_service.getById(product_id);
         WalletRequest wallet_request = new WalletRequest();
+
+        
        
         Integer product_price = product.getPrice();
         Integer balance = wallet.getBalance();
@@ -50,7 +52,7 @@ public class TransactionServiceImpl implements TransactionService {
             return transaction_repository.saveAndFlush(request.convert());
         } 
 
-         return null;
+        throw new NullPointerException("TOP UP DULU BOS");
     }
 
     @Override
