@@ -7,10 +7,14 @@ import com.code.camping.utils.dto.request.LoginAdminRequest;
 import com.code.camping.utils.dto.request.RegisterAdminRequest;
 import com.code.camping.utils.dto.response.AdminResponse;
 import com.code.camping.utils.dto.response.LoginAdminResponse;
+import com.code.camping.utils.dto.webResponse.PageResponse;
 import com.code.camping.utils.dto.webResponse.Res;
 import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,7 +45,12 @@ public class AdminController {
 			@PathVariable String id,
 			@RequestHeader(name = "Authorization") String access_token
 	){
-		Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
+		Claims jwtPayload;
+		try {
+			jwtPayload = jwtUtils.decodeAccessToken(access_token);
+		} catch (Exception e){
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid Token");
+		}
 		Date currentDate = new Date();
 		boolean isUserIdJWTEqualsAdminIdReqParams = jwtPayload.getSubject().equals(id);
 		boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
@@ -49,8 +58,31 @@ public class AdminController {
 			return Res.renderJson(AdminResponse.fromAdmin(admin_service.get_by_id(id)),
 					"Admin ID Retrieved Successfully",HttpStatus.OK);
 		} else {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied or Token expired");
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Failed to Find");
 		}
+	}
+
+	@GetMapping
+	public ResponseEntity<?> get_all(
+			@RequestHeader(name = "Authorization") String access_token,
+			@PageableDefault(page = 0,size = 10,sort = "id",direction = Sort.Direction.ASC) Pageable page,
+			@ModelAttribute RegisterAdminRequest registerAdminRequest
+	){
+		Claims jwtPayload;
+		try {
+			jwtPayload= jwtUtils.decodeAccessToken(access_token);
+		} catch (Exception e){
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid Token");
+		}
+		Date currentDate = new Date();
+		boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
+		if (isTokenNotYetExpired){
+			PageResponse<Admin> res = new PageResponse<>(admin_service.get_all(page, registerAdminRequest));
+			return Res.renderJson(res, "ok", HttpStatus.OK);
+		} else {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Failed to Find");
+		}
+
 	}
 
 	@PutMapping("/update")
@@ -58,16 +90,20 @@ public class AdminController {
 			@RequestHeader(name = "Authorization") String access_token,
 			@RequestBody RegisterAdminRequest request
 	){
-		Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
+		Claims jwtPayload = null;
+		try {
+			jwtPayload = jwtUtils.decodeAccessToken(access_token);
+		} catch (Exception e){
+			ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid Token");
+		}
 		Date currentDate = new Date();
-		String adminIdFromToken = jwtPayload.getSubject();
-		boolean isAdminIdJWTEqualsAdminIdReqParams = adminIdFromToken.equals(request.getId());
+		boolean isAdminIdJWTEqualsAdminIdReqParams = jwtPayload.getSubject().equals(request.getId());
 		boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
 		if (isAdminIdJWTEqualsAdminIdReqParams && isTokenNotYetExpired) {
 			Admin admin = admin_service.update(request);
 			return ResponseEntity.ok(AdminResponse.fromAdmin(admin));
 		} else {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied or Token expired");
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Failed to Find");
 		}
 	}
 
@@ -76,7 +112,12 @@ public class AdminController {
 			@PathVariable String id,
 			@RequestHeader(name = "Authorization") String access_token
 	){
-		Claims jwtPayLoad = jwtUtils.decodeAccessToken(access_token);
+		Claims jwtPayLoad;
+		try {
+			jwtPayLoad = jwtUtils.decodeAccessToken(access_token);
+		} catch (Exception e){
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid Token");
+		}
 		Date currentDate = new Date();
 		boolean isAdminIdJWTEqualsAdminIdReqParams = jwtPayLoad.getSubject().equals(id);
 		boolean isTokenNotYetExpired = currentDate.before(jwtPayLoad.getExpiration());
@@ -89,7 +130,7 @@ public class AdminController {
 				return Res.renderJson(null,"Failed to delete admin",HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		} else {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied or Token expired");
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Failed to Find");
 		}
 	}
 }
