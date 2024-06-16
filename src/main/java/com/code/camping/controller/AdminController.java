@@ -10,6 +10,7 @@ import com.code.camping.utils.dto.response.LoginAdminResponse;
 import com.code.camping.utils.dto.webResponse.PageResponse;
 import com.code.camping.utils.dto.webResponse.Res;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -42,7 +43,7 @@ public class AdminController {
 
 	@GetMapping("/{id}")
 	public ResponseEntity<?> get_by_id(
-			@PathVariable String id,
+			@RequestParam String id,
 			@RequestHeader(name = "Authorization") String access_token
 	){
 		Claims jwtPayload;
@@ -52,9 +53,9 @@ public class AdminController {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid Token");
 		}
 		Date currentDate = new Date();
-		boolean isUserIdJWTEqualsAdminIdReqParams = jwtPayload.getSubject().equals(id);
+		boolean isAdminIdJWTEqualsAdminIdReqParams = jwtPayload.getSubject().equals(id);
 		boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
-		if (isUserIdJWTEqualsAdminIdReqParams && isTokenNotYetExpired) {
+		if (isAdminIdJWTEqualsAdminIdReqParams && isTokenNotYetExpired) {
 			return Res.renderJson(AdminResponse.fromAdmin(admin_service.get_by_id(id)),
 					"Admin ID Retrieved Successfully",HttpStatus.OK);
 		} else {
@@ -76,12 +77,12 @@ public class AdminController {
 		}
 		Date currentDate = new Date();
 		boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
-		if (isTokenNotYetExpired){
+		String role = jwtPayload.get("role", String.class);
+		if ("Admin".equals(role) && isTokenNotYetExpired){
 			PageResponse<Admin> res = new PageResponse<>(admin_service.get_all(page, registerAdminRequest));
 			return Res.renderJson(res, "ok", HttpStatus.OK);
-		} else {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Failed to Find");
 		}
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access Denied");
 
 	}
 

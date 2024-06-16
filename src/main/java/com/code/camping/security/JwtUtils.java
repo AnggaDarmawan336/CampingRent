@@ -14,7 +14,7 @@ import java.util.Date;
 @Component
 public class JwtUtils {
     private final String jwtSignatureSecret = "java-incubation-25-final-project-team-2";
-    private final int jwtExpirationInMs = 1000 * 60 * 60 * 24;
+    private final int jwtExpirationInMs = 1000 * 60 * 60 * 1;
 
     public SecretKey getSigningKey(){
         return Keys.hmacShaKeyFor(jwtSignatureSecret.getBytes());
@@ -23,7 +23,7 @@ public class JwtUtils {
     public String generateAccessToken(User user) {
         Date currentDate = new Date();
         Date expirationDate = new Date(currentDate.getTime() + jwtExpirationInMs);
-        return Jwts.builder().subject(user.getId())
+        return Jwts.builder().subject(user.getId()).claim("role","User")
                 .issuedAt(currentDate).expiration(expirationDate)
                 .signWith(getSigningKey()).compact();
     }
@@ -31,7 +31,7 @@ public class JwtUtils {
     public String generateAccessTokenForAdmin(Admin admin){
         Date currentDate = new Date();
         Date expirationDate = new Date(currentDate.getTime() + jwtExpirationInMs);
-        return Jwts.builder().subject(admin.getId())
+        return Jwts.builder().subject(admin.getId()).claim("role","Admin")
                 .issuedAt(currentDate).expiration(expirationDate)
                 .signWith(getSigningKey()).compact();
     }
