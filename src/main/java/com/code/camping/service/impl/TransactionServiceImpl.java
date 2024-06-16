@@ -45,7 +45,7 @@ public class TransactionServiceImpl implements TransactionService {
        
         Integer product_price = product.getPrice();
         Integer balance = wallet.getBalance();
-        Integer total_price = request.getQuantity() * product_price;
+        Integer total_price = request.getDay() * product_price;
 
         if (balance >= total_price && id.equals(wallet_service.fineByUserId(id).getUser().getId())) {
 

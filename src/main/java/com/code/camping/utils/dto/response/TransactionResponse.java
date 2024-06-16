@@ -24,7 +24,7 @@ public class TransactionResponse {
 
         return TransactionResponse.builder()
                 .id(transaction.getId())
-                .quantity(transaction.getQuantity())
+                .quantity(transaction.getDay())
                 .price_history(transaction.getPrice_history())
                 .user_id(user_id)
                 .product_id(product_id)

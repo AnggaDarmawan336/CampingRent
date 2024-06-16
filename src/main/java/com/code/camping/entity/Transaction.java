@@ -20,9 +20,8 @@ public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    private Integer quantity;
+    private Integer day;
     private Date dateStart;
-    private Date dateEnd;
     private Integer price_history;
     
     @ManyToOne
