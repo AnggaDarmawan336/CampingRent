@@ -108,15 +108,16 @@ public class TransactionController {
     
 
     @PutMapping(path = "/update")
-    public ResponseEntity<?> update(@RequestHeader(name = "Authorization") String access_token, @RequestBody TransactionRequest request, @RequestParam String id ) {
+    public ResponseEntity<?> update(@RequestHeader(name = "Authorization") String access_token, @RequestBody TransactionRequest request) {
         Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
         Date currentDate = new Date();
         String ProductIdFromToken = jwtPayload.getSubject();
-        boolean isProductIdJWTequalsProductIdReqParams = ProductIdFromToken.equals(id);
+        String user_id = user_service.getById(ProductIdFromToken).getId();
+        boolean isProductIdJWTequalsProductIdReqParams = ProductIdFromToken.equals(user_id);
         boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
 
         if (isProductIdJWTequalsProductIdReqParams && isTokenNotYetExpired) {
-            Transaction updatedProduct = transaction_service.update(request);
+            Transaction updatedProduct = transaction_service.update(request , ProductIdFromToken);
             return ResponseEntity.ok(TransactionResponse.fromTransaction(updatedProduct));
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied or Token expired");

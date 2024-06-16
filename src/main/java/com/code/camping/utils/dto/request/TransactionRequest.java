@@ -16,21 +16,24 @@ import java.util.Date;
 public class TransactionRequest {
 
     private String id;
-    private Integer day;
+    private Integer quantity;
     private Integer price_history;
     @NotNull(message = "User id cannot be null")
     private String user_id;
     private String product_id;
     private Date dateStart;
     private Date dateEnd;
+    private Integer total;
 
     public Transaction convert(){
         Transaction transaction = new Transaction();
         transaction.setId(id);
-        transaction.setDay(day);
+        transaction.setQuantity(quantity);
         transaction.setPrice_history(price_history);
         transaction.setDateStart(dateStart);
         transaction.setDateEnd(dateEnd);
+        transaction.setTotal(total);
+
 
         if(dateStart != null && dateEnd != null){
             long diffInMillies = Math.abs(dateEnd.getTime() - dateStart.getTime());

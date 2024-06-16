@@ -39,7 +39,7 @@ public class TransactionServiceImpl implements TransactionService {
         if (request.getDateStart() != null && request.getDateEnd() != null) {
             long diffInMillies = Math.abs(request.getDateEnd().getTime() - request.getDateStart().getTime());
             int diff = (int) (diffInMillies / (1000 * 60 * 60 * 24));
-            Integer total_price = diff * product_price;
+            Integer total_price = diff * product_price * request.getQuantity();
 
             if (balance >= total_price && id.equals(wallet_service.fineByUserId(id).getUser().getId())) {
                 wallet_request.setId(wallet.getId());
@@ -49,6 +49,8 @@ public class TransactionServiceImpl implements TransactionService {
                 wallet_request.setBalance(balance - total_price);
                 request.setUser_id(id);
                 wallet_service.update(wallet_request);
+
+                request.setTotal(total_price);
 
                 Transaction transaction = request.convert();
                 transaction.setDuration(Integer.valueOf(String.valueOf(diff)));
@@ -74,7 +76,22 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Transaction update(TransactionRequest request) {
+    public Transaction update(TransactionRequest request , String id) {
+
+        Integer product_price = request.getPrice_history();
+
+        Transaction total_lama = this.getById(request.getId());
+       
+        long diffInMillies = Math.abs(request.getDateEnd().getTime() - request.getDateStart().getTime());
+        int diff = (int) (diffInMillies / (1000 * 60 * 60 * 24));
+       
+        Integer total_baru = diff * product_price * request.getQuantity();
+        Integer baru = total_baru - total_lama.getTotal();
+        Wallet wallet_baru = wallet_service.fineByUserId(id);
+
+        wallet_baru.setBalance(wallet_baru.getBalance() - baru);
+        request.setUser_id(id);
+        request.setTotal(total_baru);
         return transaction_repository.saveAndFlush(request.convert());
     }
 

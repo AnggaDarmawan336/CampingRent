@@ -12,7 +12,7 @@ public interface TransactionService {
     Transaction create(TransactionRequest request, String id);
     Page<Transaction> getAll(Pageable pageable, TransactionRequest request);
     Transaction getById(String id);
-    Transaction update(TransactionRequest request);
+    Transaction update(TransactionRequest request,String id);
     void delete(String id);
     List<Transaction> findByUserId(String userId);
 

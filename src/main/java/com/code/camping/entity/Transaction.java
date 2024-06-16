@@ -20,11 +20,12 @@ public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    private Integer day;
+    private Integer quantity;
     private Date dateStart;
     private Date dateEnd;
     private Integer duration;
     private Integer price_history;
+    private Integer total;
     
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

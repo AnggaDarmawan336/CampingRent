@@ -57,14 +57,13 @@ public class ProductController {
 
         Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
         Date currentDate = new Date();
-        boolean isProductIdJWTequalsProductIdReqParams = jwtPayload.getSubject().equals(admin_service.get_by_id(jwtPayload.getSubject()).getId());
         boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
 
-        if (isProductIdJWTequalsProductIdReqParams && isTokenNotYetExpired) {
+        if (isTokenNotYetExpired) {
             PageResponse<Product> res = new PageResponse<>(product_service.getAll(page, request));
             return Res.renderJson(res, "ok", HttpStatus.OK);
         } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied or Token expired");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Token expired");
         }
 
     }
