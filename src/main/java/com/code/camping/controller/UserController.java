@@ -7,10 +7,14 @@ import com.code.camping.utils.dto.request.LoginUserRequest;
 import com.code.camping.utils.dto.request.RegisterUserRequest;
 import com.code.camping.utils.dto.response.LoginUserResponse;
 import com.code.camping.utils.dto.response.UserResponse;
+import com.code.camping.utils.dto.webResponse.PageResponse;
 import com.code.camping.utils.dto.webResponse.Res;
 import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -48,6 +52,28 @@ public class UserController {
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Failed to Find");
         }
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getAll(
+            @RequestHeader(name = "Authorization") String access_token,
+            @PageableDefault(page = 0,size = 10,sort = "id",direction = Sort.Direction.ASC) Pageable page,
+            @ModelAttribute RegisterUserRequest registerUserRequest
+    ){
+        Claims jwtPayload;
+        try {
+            jwtPayload = jwtUtils.decodeAccessToken(access_token);
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid Token");
+        }
+        Date currentDate = new Date();
+        boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
+        String role = jwtPayload.get("role", String.class);
+        if ("Admin".equals(role) && isTokenNotYetExpired){
+            PageResponse<User> res = new PageResponse<>(user_service.getAll(page,registerUserRequest));
+            return Res.renderJson(res,"ok",HttpStatus.OK);
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access Denied");
     }
 
     @PutMapping("/update")

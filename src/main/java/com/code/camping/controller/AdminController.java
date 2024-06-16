@@ -41,27 +41,27 @@ public class AdminController {
 		return admin_service.login(request);
 	}
 
-	@GetMapping("/{id}")
-	public ResponseEntity<?> get_by_id(
-			@RequestParam String id,
-			@RequestHeader(name = "Authorization") String access_token
-	){
-		Claims jwtPayload;
-		try {
-			jwtPayload = jwtUtils.decodeAccessToken(access_token);
-		} catch (Exception e){
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid Token");
-		}
-		Date currentDate = new Date();
-		boolean isAdminIdJWTEqualsAdminIdReqParams = jwtPayload.getSubject().equals(id);
-		boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
-		if (isAdminIdJWTEqualsAdminIdReqParams && isTokenNotYetExpired) {
-			return Res.renderJson(AdminResponse.fromAdmin(admin_service.get_by_id(id)),
-					"Admin ID Retrieved Successfully",HttpStatus.OK);
-		} else {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Failed to Find");
-		}
-	}
+//	@GetMapping("/{id}")
+//	public ResponseEntity<?> get_by_id(
+//			@PathVariable String id,
+//			@RequestHeader(name = "Authorization") String access_token
+//	){
+//		Claims jwtPayload;
+//		try {
+//			jwtPayload = jwtUtils.decodeAccessToken(access_token);
+//		} catch (Exception e){
+//			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid Token");
+//		}
+//		Date currentDate = new Date();
+//		boolean isAdminIdJWTEqualsAdminIdReqParams = jwtPayload.getSubject().equals(id);
+//		boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
+//		if (isAdminIdJWTEqualsAdminIdReqParams && isTokenNotYetExpired) {
+//			return Res.renderJson(AdminResponse.fromAdmin(admin_service.get_by_id(id)),
+//					"Admin ID Retrieved Successfully",HttpStatus.OK);
+//		} else {
+//			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Failed to Find");
+//		}
+//	}
 
 	@GetMapping
 	public ResponseEntity<?> get_all(

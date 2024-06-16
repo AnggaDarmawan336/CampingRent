@@ -4,10 +4,14 @@ import com.code.camping.entity.User;
 import com.code.camping.repository.UserRepository;
 import com.code.camping.security.JwtUtils;
 import com.code.camping.service.UserService;
+import com.code.camping.utils.GeneralSpecification;
 import com.code.camping.utils.dto.request.LoginUserRequest;
 import com.code.camping.utils.dto.request.RegisterUserRequest;
 import com.code.camping.utils.dto.response.LoginUserResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -51,6 +55,12 @@ public class UserServiceImpl implements UserService {
     public User getById(String id) {
         return user_repository.findById(id)
                 .orElseThrow(() -> new HttpServerErrorException(HttpStatus.NOT_FOUND, "User with id " + id + " is not found"));
+    }
+
+    @Override
+    public Page<User> getAll(Pageable pageable, RegisterUserRequest registerUserRequest) {
+        Specification<User> specification = GeneralSpecification.get_specification(registerUserRequest);
+        return user_repository.findAll(specification,pageable);
     }
 
     @Override
