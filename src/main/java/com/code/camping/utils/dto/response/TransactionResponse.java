@@ -5,6 +5,8 @@ import com.code.camping.entity.Transaction;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.Date;
+
 @AllArgsConstructor
 @Builder
 @Getter
@@ -17,6 +19,9 @@ public class TransactionResponse {
     private Integer price_history;
     private String user_id;
     private String product_id;
+    private Date dateStart;
+    private Date dateEnd;
+    private Integer duration;
 
     public static TransactionResponse fromTransaction(Transaction transaction) {
         String user_id = (transaction.getUser() != null) ? transaction.getUser().getId() : null;
@@ -28,8 +33,9 @@ public class TransactionResponse {
                 .price_history(transaction.getPrice_history())
                 .user_id(user_id)
                 .product_id(product_id)
+                .dateStart(transaction.getDateStart())
+                .dateEnd(transaction.getDateEnd())
+                .duration(transaction.getDuration())
                 .build();
     }
-
-
 }

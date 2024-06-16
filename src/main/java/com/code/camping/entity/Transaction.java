@@ -22,6 +22,8 @@ public class Transaction {
     private String id;
     private Integer day;
     private Date dateStart;
+    private Date dateEnd;
+    private Integer duration;
     private Integer price_history;
     
     @ManyToOne

@@ -2,23 +2,16 @@ package com.code.camping.service.impl;
 
 import com.code.camping.entity.Product;
 import com.code.camping.entity.Transaction;
-import com.code.camping.entity.User;
 import com.code.camping.entity.Wallet;
 import com.code.camping.repository.TransactionRepository;
-import com.code.camping.repository.WalletRepository;
-
 import com.code.camping.service.ProductService;
 import com.code.camping.service.TransactionService;
-import com.code.camping.service.UserService;
 import com.code.camping.service.WalletService;
 import com.code.camping.utils.GeneralSpecification;
 import com.code.camping.utils.dto.request.TransactionRequest;
 import com.code.camping.utils.dto.request.WalletRequest;
-
 import lombok.AllArgsConstructor;
-
 import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -34,34 +27,38 @@ public class TransactionServiceImpl implements TransactionService {
     private final ProductService product_service;
 
     @Override
-    public Transaction create(TransactionRequest request,String id) {
-
+    public Transaction create(TransactionRequest request, String id) {
         Wallet wallet = wallet_service.fineByUserId(id);
         String product_id = request.getProduct_id();
         Product product = product_service.getById(product_id);
         WalletRequest wallet_request = new WalletRequest();
 
-        
-       
         Integer product_price = product.getPrice();
         Integer balance = wallet.getBalance();
-        Integer total_price = request.getDay() * product_price;
 
-        if (balance >= total_price && id.equals(wallet_service.fineByUserId(id).getUser().getId())) {
+        if (request.getDateStart() != null && request.getDateEnd() != null) {
+            long diffInMillies = Math.abs(request.getDateEnd().getTime() - request.getDateStart().getTime());
+            int diff = (int) (diffInMillies / (1000 * 60 * 60 * 24));
+            Integer total_price = diff * product_price;
 
-            wallet_request.setId(wallet.getId());
-            wallet_request.setBalance(wallet.getBalance());
-            wallet_request.setUser_id(id);
-            wallet_request.setWalletType(wallet.getWalletType());
-            wallet_request.setBalance(balance - total_price);
-            request.setUser_id(id);
-            wallet_service.update(wallet_request);
-           
+            if (balance >= total_price && id.equals(wallet_service.fineByUserId(id).getUser().getId())) {
+                wallet_request.setId(wallet.getId());
+                wallet_request.setBalance(wallet.getBalance());
+                wallet_request.setUser_id(id);
+                wallet_request.setWalletType(wallet.getWalletType());
+                wallet_request.setBalance(balance - total_price);
+                request.setUser_id(id);
+                wallet_service.update(wallet_request);
 
-            return transaction_repository.saveAndFlush(request.convert());
-        } 
-
-        throw new NullPointerException("TOP UP DULU BOS");
+                Transaction transaction = request.convert();
+                transaction.setDuration(Integer.valueOf(String.valueOf(diff)));
+                return transaction_repository.saveAndFlush(transaction);
+            } else {
+                throw new NullPointerException("TOP UP DULU BOS");
+            }
+        } else {
+            throw new IllegalArgumentException("DateStart and DateEnd cannot be null");
+        }
     }
 
     @Override

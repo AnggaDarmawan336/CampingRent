@@ -6,6 +6,8 @@ import com.code.camping.entity.User;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
+import java.util.Date;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -14,17 +16,27 @@ import lombok.*;
 public class TransactionRequest {
 
     private String id;
-    @NotNull(message = "Quantity cannot be null")
     private Integer day;
     private Integer price_history;
+    @NotNull(message = "User id cannot be null")
     private String user_id;
     private String product_id;
+    private Date dateStart;
+    private Date dateEnd;
 
     public Transaction convert(){
         Transaction transaction = new Transaction();
         transaction.setId(id);
         transaction.setDay(day);
         transaction.setPrice_history(price_history);
+        transaction.setDateStart(dateStart);
+        transaction.setDateEnd(dateEnd);
+
+        if(dateStart != null && dateEnd != null){
+            long diffInMillies = Math.abs(dateEnd.getTime() - dateStart.getTime());
+            int diff = (int) (diffInMillies / (1000 * 60 * 60 * 24));
+            transaction.setDuration(diff);
+        }
 
         if(user_id != null){
             User transactionUser = new User();
