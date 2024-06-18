@@ -11,7 +11,6 @@ import lombok.*;
 public class WalletResponse {
 
     private String id;
-    private String walletType;
     private Integer balance;
     private String user_id;
 
@@ -20,7 +19,6 @@ public class WalletResponse {
 
         return WalletResponse.builder()
                 .id(wallet.getId())
-                .walletType(wallet.getWalletType())
                 .balance(wallet.getBalance())
                 .user_id(user_id)
                 .build();

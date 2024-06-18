@@ -15,7 +15,6 @@ public class Wallet {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    private String walletType;
     private Integer balance;
 
     @ManyToOne

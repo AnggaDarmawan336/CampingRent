@@ -25,6 +25,6 @@ public class User {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     @JsonIgnore
-    private List<Wallet> wallet_list;
+    private List<Wallet> walletList;
     
 }
