@@ -2,6 +2,7 @@ package com.code.camping.controller;
 
 import com.code.camping.entity.User;
 import com.code.camping.security.JwtUtils;
+import com.code.camping.service.AdminService;
 import com.code.camping.service.UserService;
 import com.code.camping.utils.dto.request.LoginUserRequest;
 import com.code.camping.utils.dto.request.RegisterUserRequest;
@@ -26,6 +27,7 @@ import java.util.Date;
 @RequestMapping("/users")
 public class UserController {
 
+    private final AdminService admin_service;
     private final UserService user_service;
     private final JwtUtils jwtUtils;
 
@@ -67,9 +69,11 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid Token");
         }
         Date currentDate = new Date();
+        String AdminToken = jwtPayload.getSubject();
+        String AdminService = admin_service.get_by_id(AdminToken).getId();
+        boolean EqualsTokenAdmin = jwtPayload.getSubject().equals(AdminService);
         boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
-        String role = jwtPayload.get("role", String.class);
-        if ("Admin".equals(role) && isTokenNotYetExpired){
+        if (EqualsTokenAdmin && isTokenNotYetExpired){
             PageResponse<User> res = new PageResponse<>(user_service.getAll(page,registerUserRequest));
             return Res.renderJson(res,"ok",HttpStatus.OK);
         }
