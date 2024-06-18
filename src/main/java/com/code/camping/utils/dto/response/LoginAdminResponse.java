@@ -6,5 +6,5 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class LoginAdminResponse {
-	private String access_token;
+	private String accessToken;
 }

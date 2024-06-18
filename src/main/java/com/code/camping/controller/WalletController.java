@@ -57,9 +57,9 @@ public class WalletController {
         
         Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
         Date currentDate = new Date();
-        String AdminToken = jwtPayload.getSubject();
-        String AdminService = admin_service.get_by_id(AdminToken).getId();
-        boolean isProductIdJWTequalsProductIdReqParams = jwtPayload.getSubject().equals(AdminService);
+        String getToken = jwtPayload.getSubject();
+        String getAdmin = admin_service.get_by_id(getToken).getId();
+        boolean isProductIdJWTequalsProductIdReqParams = jwtPayload.getSubject().equals(getAdmin);
         boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
 
         if (isProductIdJWTequalsProductIdReqParams && isTokenNotYetExpired) {

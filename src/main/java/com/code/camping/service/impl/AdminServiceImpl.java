@@ -20,7 +20,7 @@ import org.springframework.web.client.HttpServerErrorException;
 @Service
 @AllArgsConstructor
 public class AdminServiceImpl implements AdminService {
-	private final AdminRepository admin_repository;
+	private final AdminRepository adminRepository;
 	private JwtUtils jwtUtils;
 
 	@Override
@@ -28,20 +28,20 @@ public class AdminServiceImpl implements AdminService {
 		Admin admin = RegisterAdminRequest.fromRegisterToAdminMapper(request);
 		String hashedPassword = new BCryptPasswordEncoder().encode(request.getPassword());
 		admin.setPassword(hashedPassword);
-		return admin_repository.saveAndFlush(admin);
+		return adminRepository.saveAndFlush(admin);
 	}
 
 	@Override
 	public LoginAdminResponse login(LoginAdminRequest request) {
 		LoginAdminResponse loginAdminResponse = new LoginAdminResponse();
-		loginAdminResponse.setAccess_token("");
+		loginAdminResponse.setAccessToken("");
 		try {
-			Admin admin = admin_repository.findByEmail(request.getEmail());
+			Admin admin = adminRepository.findByEmail(request.getEmail());
 			if (admin.getEmail() != null){
 				Boolean isPasswordMatchAdmin = new BCryptPasswordEncoder().matches(request.getPassword(), admin.getPassword());
 				if (new BCryptPasswordEncoder().matches(request.getPassword(), admin.getPassword())){
 					String accessTokenForAdmin = jwtUtils.generateAccessTokenForAdmin(admin);
-					loginAdminResponse.setAccess_token(accessTokenForAdmin);
+					loginAdminResponse.setAccessToken(accessTokenForAdmin);
 				}
 			}
 			return loginAdminResponse;
@@ -51,34 +51,34 @@ public class AdminServiceImpl implements AdminService {
 	}
 
 	@Override
-	public Admin get_by_id(String id) {
-		return admin_repository.findById(id).orElseThrow(() -> new HttpServerErrorException(
+	public Admin getById(String id) {
+		return adminRepository.findById(id).orElseThrow(() -> new HttpServerErrorException(
 				HttpStatus.NOT_FOUND,"Admin with id " + id + " is not found"));
 	}
 
 	@Override
-	public Page<Admin> get_all(Pageable pageable, RegisterAdminRequest registerAdminRequest) {
-		Specification<Admin> specification = GeneralSpecification.get_specification(registerAdminRequest);
-		return admin_repository.findAll(specification,pageable);
+	public Page<Admin> getAll(Pageable pageable, RegisterAdminRequest registerAdminRequest) {
+		Specification<Admin> specification = GeneralSpecification.getSpecification(registerAdminRequest);
+		return adminRepository.findAll(specification,pageable);
 	}
 
 	@Override
 	public Admin update(RegisterAdminRequest request) {
-		Admin existing_admin = admin_repository.findById(request.getId())
+		Admin admin = adminRepository.findById(request.getId())
 				.orElseThrow(() -> new HttpServerErrorException(
 						HttpStatus.NOT_FOUND,"Admin with id " + request.getId() + " is not found"));
-		existing_admin.setName(request.getName());
-		existing_admin.setEmail(request.getEmail());
+		admin.setName(request.getName());
+		admin.setEmail(request.getEmail());
 		if (request.getPassword() != null && !request.getPassword().isEmpty()){
 			String hashedPasswordAdmin = new BCryptPasswordEncoder().encode(request.getPassword());
-			existing_admin.setPassword(hashedPasswordAdmin);
+			admin.setPassword(hashedPasswordAdmin);
 		}
-		return admin_repository.saveAndFlush(existing_admin);
+		return adminRepository.saveAndFlush(admin);
 	}
 
 	@Override
 	public void delete(String id) {
-		this.get_by_id(id);
-		admin_repository.deleteById(id);
+		this.getById(id);
+		adminRepository.deleteById(id);
 	}
 }

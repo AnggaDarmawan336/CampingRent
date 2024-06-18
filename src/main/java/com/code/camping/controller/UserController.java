@@ -48,7 +48,6 @@ public class UserController {
         Date currentDate = new Date();
         boolean isUserIdJWTequalsUserIdReqParams = jwtPayload.getSubject().equals(id);
         boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
-
         if (isUserIdJWTequalsUserIdReqParams && isTokenNotYetExpired) {
             return Res.renderJson(UserResponse.fromUser(user_service.getById(id)), "User ID Retrieved Successfully", HttpStatus.OK);
         } else {
@@ -62,18 +61,14 @@ public class UserController {
             @PageableDefault(page = 0,size = 10,sort = "id",direction = Sort.Direction.ASC) Pageable page,
             @ModelAttribute RegisterUserRequest registerUserRequest
     ){
-        Claims jwtPayload;
-        try {
-            jwtPayload = jwtUtils.decodeAccessToken(access_token);
-        } catch (Exception e){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid Token");
-        }
+        Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
         Date currentDate = new Date();
-        String AdminToken = jwtPayload.getSubject();
-        String AdminService = admin_service.get_by_id(AdminToken).getId();
-        boolean EqualsTokenAdmin = jwtPayload.getSubject().equals(AdminService);
+        String getToken = jwtPayload.getSubject();
+        String getAdmin = admin_service.get_by_id(getToken).getId();
+        boolean isAdminIdJWTEqualsAdminIdReqParams = jwtPayload.getSubject().equals(getAdmin);
         boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
-        if (EqualsTokenAdmin && isTokenNotYetExpired){
+
+        if (isAdminIdJWTEqualsAdminIdReqParams && isTokenNotYetExpired){
             PageResponse<User> res = new PageResponse<>(user_service.getAll(page,registerUserRequest));
             return Res.renderJson(res,"ok",HttpStatus.OK);
         }
@@ -114,5 +109,4 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Failed to Find");
         }
     }
-
 }

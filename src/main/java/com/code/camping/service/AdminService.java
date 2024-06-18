@@ -10,8 +10,8 @@ import org.springframework.data.domain.Pageable;
 public interface AdminService {
 	Admin create(RegisterAdminRequest request);
 	LoginAdminResponse login(LoginAdminRequest request);
-	Admin get_by_id(String id);
-	Page<Admin> get_all(Pageable pageable, RegisterAdminRequest registerAdminRequest);
+	Admin getById(String id);
+	Page<Admin> getAll(Pageable pageable, RegisterAdminRequest registerAdminRequest);
 	Admin update(RegisterAdminRequest request);
 	void delete(String id);
 }

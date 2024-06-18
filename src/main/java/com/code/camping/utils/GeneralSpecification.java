@@ -7,7 +7,7 @@ import java.util.List;
 import jakarta.persistence.criteria.Predicate;
 
 public class GeneralSpecification<T, D> {
-    public static <T, D> Specification<T> get_specification(D searchDTO) {
+    public static <T, D> Specification<T> getSpecification(D searchDTO) {
         return ((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             for (var field : searchDTO.getClass().getDeclaredFields()) {

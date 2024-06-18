@@ -26,31 +26,31 @@ import java.util.Date;
 @AllArgsConstructor
 public class AdminController {
 
-	private final AdminService admin_service;
+	private final AdminService adminService;
 	private final JwtUtils jwtUtils;
 
 	@PostMapping("/register")
 	public ResponseEntity<?> register(@Valid @RequestBody RegisterAdminRequest request) {
-		AdminResponse adminResponse = AdminResponse.fromAdmin(admin_service.create(request));
+		AdminResponse adminResponse = AdminResponse.fromAdmin(adminService.create(request));
 		return Res.renderJson(adminResponse,"Register Admin created successfully",HttpStatus.CREATED);
 	}
 
 	@PostMapping("/login")
 	public LoginAdminResponse login(@RequestBody LoginAdminRequest request){
-		return admin_service.login(request);
+		return adminService.login(request);
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<?> get_by_id(
+	public ResponseEntity<?> getById(
 			@PathVariable String id,
-			@RequestHeader(name = "Authorization") String access_token
+			@RequestHeader(name = "Authorization") String accessToken
 	){
-		Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
+		Claims jwtPayload = jwtUtils.decodeAccessToken(accessToken);
 		Date currentDate = new Date();
 		boolean isAdminIdJWTEqualsAdminIdReqParams = jwtPayload.getSubject().equals(id);
 		boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
 		if (isAdminIdJWTEqualsAdminIdReqParams && isTokenNotYetExpired) {
-			return Res.renderJson(AdminResponse.fromAdmin(admin_service.get_by_id(id)),
+			return Res.renderJson(AdminResponse.fromAdmin(adminService.getById(id)),
 					"Admin ID Retrieved Successfully",HttpStatus.OK);
 		} else {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Failed to Find");
@@ -58,61 +58,60 @@ public class AdminController {
 	}
 
 	@GetMapping
-	public ResponseEntity<?> get_all(
-			@RequestHeader(name = "Authorization") String access_token,
+	public ResponseEntity<?> getAll(
+			@RequestHeader(name = "Authorization") String accessToken,
 			@PageableDefault(page = 0,size = 10,sort = "id",direction = Sort.Direction.ASC) Pageable page,
 			@ModelAttribute RegisterAdminRequest registerAdminRequest
 	){
-		Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
+		Claims jwtPayload = jwtUtils.decodeAccessToken(accessToken);
 		Date currentDate = new Date();
-		String AdminToken = jwtPayload.getSubject();
-		String AdminService = admin_service.get_by_id(AdminToken).getId();
-		boolean EqualsAdminToken = jwtPayload.getSubject().equals(AdminService);
+		String getToken = jwtPayload.getSubject();
+		String getAdmin = adminService.getById(getToken).getId();
+		boolean isAdminIdJWTEqualsAdminIdReqParams = jwtPayload.getSubject().equals(getAdmin);
 		boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
-		if (EqualsAdminToken && isTokenNotYetExpired){
-			PageResponse<Admin> res = new PageResponse<>(admin_service.get_all(page, registerAdminRequest));
+		if (isAdminIdJWTEqualsAdminIdReqParams && isTokenNotYetExpired){
+			PageResponse<Admin> res = new PageResponse<>(adminService.getAll(page, registerAdminRequest));
 			return Res.renderJson(res, "ok", HttpStatus.OK);
 		} else {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access Denied");
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Failed to Find");
 		}
 	}
 
 	@PutMapping("/update")
 	public ResponseEntity<?> update(
-			@RequestHeader(name = "Authorization") String access_token,
+			@RequestHeader(name = "Authorization") String accessToken,
 			@RequestBody RegisterAdminRequest request
 	){
-		Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
+		Claims jwtPayload = jwtUtils.decodeAccessToken(accessToken);
 		Date currentDate = new Date();
 		boolean isAdminIdJWTEqualsAdminIdReqParams = jwtPayload.getSubject().equals(request.getId());
 		boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
 		if (isAdminIdJWTEqualsAdminIdReqParams && isTokenNotYetExpired) {
-			Admin admin = admin_service.update(request);
+			Admin admin = adminService.update(request);
 			return ResponseEntity.ok(AdminResponse.fromAdmin(admin));
 		} else {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access Denied");
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Failed to Find");
 		}
 	}
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> delete(
 			@PathVariable String id,
-			@RequestHeader(name = "Authorization") String access_token
+			@RequestHeader(name = "Authorization") String accessToken
 	){
-		Claims jwtPayLoad = jwtUtils.decodeAccessToken(access_token);
+		Claims jwtPayLoad = jwtUtils.decodeAccessToken(accessToken);
 		Date currentDate = new Date();
 		boolean isAdminIdJWTEqualsAdminIdReqParams = jwtPayLoad.getSubject().equals(id);
 		boolean isTokenNotYetExpired = currentDate.before(jwtPayLoad.getExpiration());
-
 		if (isAdminIdJWTEqualsAdminIdReqParams && isTokenNotYetExpired){
 			try {
-				admin_service.delete(id);
+				adminService.delete(id);
 				return Res.renderJson(null,"Admin deleted successfully",HttpStatus.OK);
 			} catch (Exception error){
 				return Res.renderJson(null,"Failed to delete admin",HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		} else {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access Denied");
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Failed to Find");
 		}
 	}
 }
