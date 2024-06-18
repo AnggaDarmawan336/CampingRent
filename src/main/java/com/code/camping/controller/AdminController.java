@@ -45,16 +45,11 @@ public class AdminController {
 			@PathVariable String id,
 			@RequestHeader(name = "Authorization") String access_token
 	){
-		Claims jwtPayload;
-		try {
-			jwtPayload = jwtUtils.decodeAccessToken(access_token);
-		} catch (Exception e){
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid Token");
-		}
+		Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
 		Date currentDate = new Date();
-		boolean isUserIdJWTEqualsAdminIdReqParams = jwtPayload.getSubject().equals(id);
+		boolean isAdminIdJWTEqualsAdminIdReqParams = jwtPayload.getSubject().equals(id);
 		boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
-		if (isUserIdJWTEqualsAdminIdReqParams && isTokenNotYetExpired) {
+		if (isAdminIdJWTEqualsAdminIdReqParams && isTokenNotYetExpired) {
 			return Res.renderJson(AdminResponse.fromAdmin(admin_service.get_by_id(id)),
 					"Admin ID Retrieved Successfully",HttpStatus.OK);
 		} else {
@@ -68,21 +63,18 @@ public class AdminController {
 			@PageableDefault(page = 0,size = 10,sort = "id",direction = Sort.Direction.ASC) Pageable page,
 			@ModelAttribute RegisterAdminRequest registerAdminRequest
 	){
-		Claims jwtPayload;
-		try {
-			jwtPayload= jwtUtils.decodeAccessToken(access_token);
-		} catch (Exception e){
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid Token");
-		}
+		Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
 		Date currentDate = new Date();
+		String AdminToken = jwtPayload.getSubject();
+		String AdminService = admin_service.get_by_id(AdminToken).getId();
+		boolean EqualsAdminToken = jwtPayload.getSubject().equals(AdminService);
 		boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
-		if (isTokenNotYetExpired){
+		if (EqualsAdminToken && isTokenNotYetExpired){
 			PageResponse<Admin> res = new PageResponse<>(admin_service.get_all(page, registerAdminRequest));
 			return Res.renderJson(res, "ok", HttpStatus.OK);
 		} else {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Failed to Find");
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access Denied");
 		}
-
 	}
 
 	@PutMapping("/update")
@@ -90,12 +82,7 @@ public class AdminController {
 			@RequestHeader(name = "Authorization") String access_token,
 			@RequestBody RegisterAdminRequest request
 	){
-		Claims jwtPayload = null;
-		try {
-			jwtPayload = jwtUtils.decodeAccessToken(access_token);
-		} catch (Exception e){
-			ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid Token");
-		}
+		Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
 		Date currentDate = new Date();
 		boolean isAdminIdJWTEqualsAdminIdReqParams = jwtPayload.getSubject().equals(request.getId());
 		boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
@@ -103,7 +90,7 @@ public class AdminController {
 			Admin admin = admin_service.update(request);
 			return ResponseEntity.ok(AdminResponse.fromAdmin(admin));
 		} else {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Failed to Find");
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access Denied");
 		}
 	}
 
@@ -112,12 +99,7 @@ public class AdminController {
 			@PathVariable String id,
 			@RequestHeader(name = "Authorization") String access_token
 	){
-		Claims jwtPayLoad;
-		try {
-			jwtPayLoad = jwtUtils.decodeAccessToken(access_token);
-		} catch (Exception e){
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid Token");
-		}
+		Claims jwtPayLoad = jwtUtils.decodeAccessToken(access_token);
 		Date currentDate = new Date();
 		boolean isAdminIdJWTEqualsAdminIdReqParams = jwtPayLoad.getSubject().equals(id);
 		boolean isTokenNotYetExpired = currentDate.before(jwtPayLoad.getExpiration());
@@ -130,7 +112,7 @@ public class AdminController {
 				return Res.renderJson(null,"Failed to delete admin",HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		} else {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Failed to Find");
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access Denied");
 		}
 	}
 }
