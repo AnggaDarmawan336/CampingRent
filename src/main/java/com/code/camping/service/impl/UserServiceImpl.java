@@ -65,16 +65,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User update(RegisterUserRequest request) {
-        User existing_user = userRepository.findById(request.getId())
+        User existingUser = userRepository.findById(request.getId())
                 .orElseThrow(() -> new HttpServerErrorException(HttpStatus.NOT_FOUND, "User with id " + request.getId() + " is not found"));
-        existing_user.setName(request.getName());
-        existing_user.setEmail(request.getEmail());
+        existingUser.setName(request.getName());
+        existingUser.setEmail(request.getEmail());
         if (request.getPassword() != null && !request.getPassword().isEmpty()) {
             String hashedPassword = new BCryptPasswordEncoder().encode(request.getPassword());
-            existing_user.setPassword(hashedPassword);
+            existingUser.setPassword(hashedPassword);
         }
 
-        return userRepository.saveAndFlush(existing_user);
+        return userRepository.saveAndFlush(existingUser);
     }
 
     @Override
