@@ -21,28 +21,28 @@ import org.springframework.web.client.HttpServerErrorException;
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository user_repository;
+    private final UserRepository userRepository;
     private final JwtUtils jwtUtils;
 
     @Override
     public User create(RegisterUserRequest request) {
-        User new_user = RegisterUserRequest.fromRegisterToUserMapper(request);
+        User newUser = RegisterUserRequest.fromRegisterToUserMapper(request);
         String hashedPassword = new BCryptPasswordEncoder().encode(request.getPassword());
-        new_user.setPassword(hashedPassword);
-        return user_repository.saveAndFlush(new_user);
+        newUser.setPassword(hashedPassword);
+        return userRepository.saveAndFlush(newUser);
     }
 
     @Override
     public LoginUserResponse login(LoginUserRequest request) {
         LoginUserResponse loginResponse = new LoginUserResponse();
-        loginResponse.setAccess_token("");
+        loginResponse.setAccessToken("");
         try {
-            User user = user_repository.findByEmail(request.getEmail());
+            User user = userRepository.findByEmail(request.getEmail());
             if(user.getEmail() != null) {
                 Boolean isPasswordMatch = new BCryptPasswordEncoder().matches(request.getPassword(), user.getPassword());
                 if(new BCryptPasswordEncoder().matches(request.getPassword(), user.getPassword())) {
                     String accessToken = jwtUtils.generateAccessToken(user);
-                    loginResponse.setAccess_token(accessToken);
+                    loginResponse.setAccessToken(accessToken);
                 }
             }
             return loginResponse;
@@ -53,19 +53,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getById(String id) {
-        return user_repository.findById(id)
+        return userRepository.findById(id)
                 .orElseThrow(() -> new HttpServerErrorException(HttpStatus.NOT_FOUND, "User with id " + id + " is not found"));
     }
 
     @Override
     public Page<User> getAll(Pageable pageable, RegisterUserRequest registerUserRequest) {
-        Specification<User> specification = GeneralSpecification.get_specification(registerUserRequest);
-        return user_repository.findAll(specification,pageable);
+        Specification<User> specification = GeneralSpecification.getSpecification(registerUserRequest);
+        return userRepository.findAll(specification,pageable);
     }
 
     @Override
     public User update(RegisterUserRequest request) {
-        User existing_user = user_repository.findById(request.getId())
+        User existing_user = userRepository.findById(request.getId())
                 .orElseThrow(() -> new HttpServerErrorException(HttpStatus.NOT_FOUND, "User with id " + request.getId() + " is not found"));
         existing_user.setName(request.getName());
         existing_user.setEmail(request.getEmail());
@@ -74,12 +74,12 @@ public class UserServiceImpl implements UserService {
             existing_user.setPassword(hashedPassword);
         }
 
-        return user_repository.saveAndFlush(existing_user);
+        return userRepository.saveAndFlush(existing_user);
     }
 
     @Override
     public void delete(String id) {
         this.getById(id);
-        user_repository.deleteById(id);
+        userRepository.deleteById(id);
     }
 }

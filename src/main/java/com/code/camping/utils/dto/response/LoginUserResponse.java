@@ -8,6 +8,6 @@ import lombok.*;
 @Data
 public class LoginUserResponse {
 
-    private String access_token;
+    private String accessToken;
 
 }
