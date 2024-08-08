@@ -55,7 +55,9 @@ public class ErrorController {
     public static class WeatherDataNotFoundException extends RuntimeException {
         public WeatherDataNotFoundException(String message) {
             super(message);
-        }
+        };
     }
+
+     // Exception untuk uang tidak cukup
 
 }

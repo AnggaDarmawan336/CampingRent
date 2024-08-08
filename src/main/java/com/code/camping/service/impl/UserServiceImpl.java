@@ -4,10 +4,14 @@ import com.code.camping.entity.User;
 import com.code.camping.repository.UserRepository;
 import com.code.camping.security.JwtUtils;
 import com.code.camping.service.UserService;
+import com.code.camping.utils.GeneralSpecification;
 import com.code.camping.utils.dto.request.LoginUserRequest;
 import com.code.camping.utils.dto.request.RegisterUserRequest;
 import com.code.camping.utils.dto.response.LoginUserResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,28 +21,28 @@ import org.springframework.web.client.HttpServerErrorException;
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository user_repository;
+    private final UserRepository userRepository;
     private final JwtUtils jwtUtils;
 
     @Override
     public User create(RegisterUserRequest request) {
-        User new_user = RegisterUserRequest.fromRegisterToUserMapper(request);
+        User newUser = RegisterUserRequest.fromRegisterToUserMapper(request);
         String hashedPassword = new BCryptPasswordEncoder().encode(request.getPassword());
-        new_user.setPassword(hashedPassword);
-        return user_repository.saveAndFlush(new_user);
+        newUser.setPassword(hashedPassword);
+        return userRepository.saveAndFlush(newUser);
     }
 
     @Override
     public LoginUserResponse login(LoginUserRequest request) {
         LoginUserResponse loginResponse = new LoginUserResponse();
-        loginResponse.setAccess_token("");
+        loginResponse.setAccessToken("");
         try {
-            User user = user_repository.findByEmail(request.getEmail());
+            User user = userRepository.findByEmail(request.getEmail());
             if(user.getEmail() != null) {
                 Boolean isPasswordMatch = new BCryptPasswordEncoder().matches(request.getPassword(), user.getPassword());
                 if(new BCryptPasswordEncoder().matches(request.getPassword(), user.getPassword())) {
                     String accessToken = jwtUtils.generateAccessToken(user);
-                    loginResponse.setAccess_token(accessToken);
+                    loginResponse.setAccessToken(accessToken);
                 }
             }
             return loginResponse;
@@ -49,27 +53,33 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getById(String id) {
-        return user_repository.findById(id)
+        return userRepository.findById(id)
                 .orElseThrow(() -> new HttpServerErrorException(HttpStatus.NOT_FOUND, "User with id " + id + " is not found"));
     }
 
     @Override
+    public Page<User> getAll(Pageable pageable, RegisterUserRequest registerUserRequest) {
+        Specification<User> specification = GeneralSpecification.getSpecification(registerUserRequest);
+        return userRepository.findAll(specification,pageable);
+    }
+
+    @Override
     public User update(RegisterUserRequest request) {
-        User existing_user = user_repository.findById(request.getId())
+        User existingUser = userRepository.findById(request.getId())
                 .orElseThrow(() -> new HttpServerErrorException(HttpStatus.NOT_FOUND, "User with id " + request.getId() + " is not found"));
-        existing_user.setName(request.getName());
-        existing_user.setEmail(request.getEmail());
+        existingUser.setName(request.getName());
+        existingUser.setEmail(request.getEmail());
         if (request.getPassword() != null && !request.getPassword().isEmpty()) {
             String hashedPassword = new BCryptPasswordEncoder().encode(request.getPassword());
-            existing_user.setPassword(hashedPassword);
+            existingUser.setPassword(hashedPassword);
         }
 
-        return user_repository.saveAndFlush(existing_user);
+        return userRepository.saveAndFlush(existingUser);
     }
 
     @Override
     public void delete(String id) {
         this.getById(id);
-        user_repository.deleteById(id);
+        userRepository.deleteById(id);
     }
 }

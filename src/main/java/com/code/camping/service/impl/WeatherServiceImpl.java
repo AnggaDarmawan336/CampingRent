@@ -98,4 +98,7 @@ public class WeatherServiceImpl implements WeatherService {
         List<Weather> pageContent = filteredData.subList(start, end);
         return new PageResponse<>(pageContent, (long) filteredData.size(), (filteredData.size() + size - 1) / size, page, size);
     }
+
+    
+
 }

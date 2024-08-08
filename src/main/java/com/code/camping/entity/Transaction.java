@@ -1,6 +1,7 @@
 package com.code.camping.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,6 +11,7 @@ import java.util.Date;
 @Entity
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "transactions")
@@ -21,7 +23,9 @@ public class Transaction {
     private Integer quantity;
     private Date dateStart;
     private Date dateEnd;
+    private Integer duration;
     private Integer price_history;
+    private Integer total;
     
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

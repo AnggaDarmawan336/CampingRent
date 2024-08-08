@@ -9,4 +9,5 @@ public interface WeatherService {
     List<Weather> getWeatherData() throws Exception;
 
     PageResponse<Weather> getAllWithPagingAndFiltering(String date, String status, String time, int page, int size) throws Exception;
+   
 }

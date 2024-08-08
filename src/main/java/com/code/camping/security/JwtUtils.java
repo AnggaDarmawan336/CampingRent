@@ -1,5 +1,7 @@
 package com.code.camping.security;
 
+import com.code.camping.entity.Admin;
+import com.code.camping.entity.Product;
 import com.code.camping.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -22,6 +24,14 @@ public class JwtUtils {
         Date currentDate = new Date();
         Date expirationDate = new Date(currentDate.getTime() + jwtExpirationInMs);
         return Jwts.builder().subject(user.getId())
+                .issuedAt(currentDate).expiration(expirationDate)
+                .signWith(getSigningKey()).compact();
+    }
+
+    public String generateAccessTokenForAdmin(Admin admin){
+        Date currentDate = new Date();
+        Date expirationDate = new Date(currentDate.getTime() + jwtExpirationInMs);
+        return Jwts.builder().subject(admin.getId())
                 .issuedAt(currentDate).expiration(expirationDate)
                 .signWith(getSigningKey()).compact();
     }
