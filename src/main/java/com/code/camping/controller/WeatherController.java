@@ -45,6 +45,4 @@ public class WeatherController {
         PageResponse<Weather> pageResponse = weatherService.getAllWithPagingAndFiltering(date, name, time, page, size);
         return Res.renderJson(pageResponse, "The weather data was successfully found", HttpStatus.OK);
     }
-
-
 }

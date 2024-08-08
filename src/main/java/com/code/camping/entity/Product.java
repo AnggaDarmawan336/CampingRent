@@ -23,5 +23,5 @@ public class Product {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
     @JsonIgnore
-    List<Transaction> transaction_list;
+    private List<Transaction> transaction_list;
 }
