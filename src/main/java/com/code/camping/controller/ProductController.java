@@ -36,7 +36,7 @@ public class ProductController {
     public ResponseEntity<?> create(@RequestBody ProductRequest request, @RequestHeader(name = "Authorization") String access_token) {
         Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
         Date currentDate = new Date();
-        boolean isProductIdJWTequalsProductIdReqParams = jwtPayload.getSubject().equals(admin_service.get_by_id(jwtPayload.getSubject()).getId());
+        boolean isProductIdJWTequalsProductIdReqParams = jwtPayload.getSubject().equals(admin_service.getById(jwtPayload.getSubject()).getId());
         boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
 
         if (isProductIdJWTequalsProductIdReqParams && isTokenNotYetExpired) {
@@ -68,24 +68,24 @@ public class ProductController {
 
     }
 
-    // @GetMapping(path = "/{id_product}")
-    // public ResponseEntity<?> getById(@RequestHeader(name = "Authorization") String access_token, @PathVariable String id_product, @RequestParam String id) {
-    //     Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
-    //     Date currentDate = new Date();
-    //     boolean isProductIdJWTequalsProductIdReqParams = jwtPayload.getSubject().equals(id);
-    //     boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
+     @GetMapping(path = "/{id_product}")
+     public ResponseEntity<?> getById(@RequestHeader(name = "Authorization") String access_token, @PathVariable String id_product, @RequestParam String id) {
+         Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
+         Date currentDate = new Date();
+         boolean isProductIdJWTequalsProductIdReqParams = jwtPayload.getSubject().equals(id);
+         boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
 
-    //     if (isProductIdJWTequalsProductIdReqParams && isTokenNotYetExpired) {
-    //         return Res.renderJson(ProductResponse.fromProduct(product_service.getById(id_product)), "product ID Retrieved Successfully", HttpStatus.OK);
-    //     } else {
-    //         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied or Token expired");}
-    // }
+         if (isProductIdJWTequalsProductIdReqParams && isTokenNotYetExpired) {
+             return Res.renderJson(ProductResponse.fromProduct(product_service.getById(id_product)), "product ID Retrieved Successfully", HttpStatus.OK);
+         } else {
+             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied or Token expired");}
+     }
 
     @PutMapping(path = "/update")
     public ResponseEntity<?> update(@RequestHeader(name = "Authorization") String access_token, @RequestBody Product request) {
         Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
         Date currentDate = new Date();
-        boolean isProductIdJWTequalsProductIdReqParams = jwtPayload.getSubject().equals(admin_service.get_by_id(jwtPayload.getSubject()).getId());
+        boolean isProductIdJWTequalsProductIdReqParams = jwtPayload.getSubject().equals(admin_service.getById(jwtPayload.getSubject()).getId());
         boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
 
         if (isProductIdJWTequalsProductIdReqParams && isTokenNotYetExpired) {
@@ -101,7 +101,7 @@ public class ProductController {
     public ResponseEntity<?> delete(@RequestHeader(name = "Authorization") String access_token, @PathVariable String id_product) {
         Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
         Date currentDate = new Date();
-        boolean isProductIdJWTequalsProductIdReqParams = jwtPayload.getSubject().equals(admin_service.get_by_id(jwtPayload.getSubject()).getId());
+        boolean isProductIdJWTequalsProductIdReqParams = jwtPayload.getSubject().equals(admin_service.getById(jwtPayload.getSubject()).getId());
         boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
 
         if (isProductIdJWTequalsProductIdReqParams && isTokenNotYetExpired) {

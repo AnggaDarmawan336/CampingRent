@@ -26,7 +26,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Page<Product> getAll(Pageable pageable, ProductRequest request) {
-        Specification<Product> specification = GeneralSpecification.get_specification(request);
+        Specification<Product> specification = GeneralSpecification.getSpecification(request);
         return product_repository.findAll(specification, pageable);
     }
 

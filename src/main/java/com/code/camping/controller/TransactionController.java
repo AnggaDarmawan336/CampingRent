@@ -76,7 +76,7 @@ public class TransactionController {
         Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
         Date currentDate = new Date();  
         String userIdFromToken = jwtPayload.getSubject();
-        String admin_id = admin_service.get_by_id(userIdFromToken).getId();
+        String admin_id = admin_service.getById(userIdFromToken).getId();
         boolean isUserIdJWTequalsUserIdReqParams = userIdFromToken.equals(admin_id);
         boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
 
@@ -129,7 +129,7 @@ public class TransactionController {
     public ResponseEntity<?> delete(@RequestHeader(name = "Authorization") String access_token, @PathVariable String id_product) {
         Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
         Date currentDate = new Date();
-        boolean isProductIdJWTequalsProductIdReqParams = jwtPayload.getSubject().equals(admin_service.get_by_id(jwtPayload.getSubject()).getId());
+        boolean isProductIdJWTequalsProductIdReqParams = jwtPayload.getSubject().equals(admin_service.getById(jwtPayload.getSubject()).getId());
         boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
 
         if (isProductIdJWTequalsProductIdReqParams && isTokenNotYetExpired) {

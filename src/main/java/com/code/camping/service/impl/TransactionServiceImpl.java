@@ -45,7 +45,6 @@ public class TransactionServiceImpl implements TransactionService {
                 wallet_request.setId(wallet.getId());
                 wallet_request.setBalance(wallet.getBalance());
                 wallet_request.setUser_id(id);
-                wallet_request.setWalletType(wallet.getWalletType());
                 wallet_request.setBalance(balance - total_price);
                 request.setUser_id(id);
                 wallet_service.update(wallet_request);
@@ -65,7 +64,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Page<Transaction> getAll(Pageable pageable, TransactionRequest request) {
-        Specification<Transaction> specification = GeneralSpecification.get_specification(request);
+        Specification<Transaction> specification = GeneralSpecification.getSpecification(request);
         return transaction_repository.findAll(specification, pageable);
     }
 
