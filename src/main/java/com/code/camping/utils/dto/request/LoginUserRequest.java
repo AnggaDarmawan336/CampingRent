@@ -10,12 +10,12 @@ import lombok.*;
 @Data
 public class LoginUserRequest {
 
-    private String email;
+    private String username;
     private String password;
 
     public static User fromLoginRequestToUserMapper(LoginUserRequest loginUserRequest){
         return User.builder()
-                .email(loginUserRequest.getEmail())
+                .email(loginUserRequest.getUsername())
                 .password(loginUserRequest.password)
                 .build();
     }

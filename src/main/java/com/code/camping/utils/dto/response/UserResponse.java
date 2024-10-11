@@ -11,13 +11,13 @@ import lombok.*;
 public class UserResponse {
 
     private String id;
-    private String email;
+    private String username;
     private String password;
 
     public static UserResponse fromUser(User user){
         return UserResponse.builder()
                 .id(user.getId())
-                .email(user.getEmail())
+                .username(user.getEmail())
                 .password(user.getPassword())
                 .build();
     }

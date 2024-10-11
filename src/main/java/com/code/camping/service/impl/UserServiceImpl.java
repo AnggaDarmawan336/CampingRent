@@ -37,8 +37,8 @@ public class UserServiceImpl implements UserService {
         LoginUserResponse loginResponse = new LoginUserResponse();
         loginResponse.setAccessToken("");
         try {
-            User user = userRepository.findByEmail(request.getEmail());
-            if(user.getEmail() != null) {
+            User user = userRepository.findByUsername(request.getUsername());
+            if(user.getUsername() != null) {
                 Boolean isPasswordMatch = new BCryptPasswordEncoder().matches(request.getPassword(), user.getPassword());
                 if(new BCryptPasswordEncoder().matches(request.getPassword(), user.getPassword())) {
                     String accessToken = jwtUtils.generateAccessToken(user);
@@ -49,37 +49,5 @@ public class UserServiceImpl implements UserService {
         } catch (Exception error) {
             return loginResponse;
         }
-    }
-
-    @Override
-    public User getById(String id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new HttpServerErrorException(HttpStatus.NOT_FOUND, "User with id " + id + " is not found"));
-    }
-
-    @Override
-    public Page<User> getAll(Pageable pageable, RegisterUserRequest registerUserRequest) {
-        Specification<User> specification = GeneralSpecification.getSpecification(registerUserRequest);
-        return userRepository.findAll(specification,pageable);
-    }
-
-    @Override
-    public User update(RegisterUserRequest request) {
-        User existingUser = userRepository.findById(request.getId())
-                .orElseThrow(() -> new HttpServerErrorException(HttpStatus.NOT_FOUND, "User with id " + request.getId() + " is not found"));
-        existingUser.setName(request.getName());
-        existingUser.setEmail(request.getEmail());
-        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
-            String hashedPassword = new BCryptPasswordEncoder().encode(request.getPassword());
-            existingUser.setPassword(hashedPassword);
-        }
-
-        return userRepository.saveAndFlush(existingUser);
-    }
-
-    @Override
-    public void delete(String id) {
-        this.getById(id);
-        userRepository.deleteById(id);
     }
 }
